@@ -1,15 +1,19 @@
-"use client";
-import React from "react";
-import { twMerge } from "tailwind-merge";
-import { RxCaretLeft, RxCaretRight } from "react-icons/rx";
-import { useRouter } from "next/navigation";
-import { FaUserAlt } from "react-icons/fa";
+'use client';
 
-import { HiHome } from "react-icons/hi";
-import { BiSearch } from "react-icons/bi";
-import Button from "./Button";
-import useAuthModal from "@/hooks/useAuthModal";
-import AuthModal from "@/components/AuthModal";
+import {twMerge} from 'tailwind-merge';
+import {RxCaretLeft, RxCaretRight} from 'react-icons/rx';
+import {useRouter} from 'next/navigation';
+import {FaUserAlt} from 'react-icons/fa';
+import {useSupabaseClient} from '@supabase/auth-helpers-react';
+import {toast} from 'react-hot-toast';
+import {HiHome} from 'react-icons/hi';
+import {BiSearch} from 'react-icons/bi';
+
+import useAuthModal from '@/hooks/useAuthModal';
+import {useUser} from '@/hooks/useUser';
+import usePlayer from '@/hooks/usePlayer';
+
+import Button from './Button';
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -17,68 +21,125 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ children, className }) => {
-  const authModal = useAuthModal();
+    const player = usePlayer();
   const router = useRouter();
+    const authModal = useAuthModal();
+
+    const supabaseClient = useSupabaseClient();
+    const {user} = useUser();
+
+    const handleLogout = async () => {
+        const {error} = await supabaseClient.auth.signOut();
+        player.reset();
+        router.refresh();
+
+        if (error) {
+            toast.error(error.message);
+        }
+    };
+
   return (
-    <>
       <div
-        className={twMerge(
-          "p-6 bg-gradient-to-b from-indigo-800 h-fit",
-          className
-        )}
+          className={twMerge(
+              `
+        h-fit 
+        bg-gradient-to-b 
+        from-emerald-800 
+        p-6
+        `,
+              className
+          )}
       >
-        <div className={"flex flex-col items-center justify-center w-full"}>
-          <h1 className={'text-yellow-400 text-3xl mb-2 font-bold'}>MusicalSharks</h1>
-          <p className={"flex items-center justify-center text-sm text-blue-300"}>
-            Music App For All Moods 12
-          </p>
-        </div>
-        <div className="w-full mb-4 flex items-center justify-between">
-          <div className="hidden md:flex gap-x-2 items-center">
-            <button
-              onClick={() => router.back()}
-              className="transition hover:opacity-75 cursor-pointer rounded-full bg-black flex justify-center items-center"
-            >
-              <RxCaretLeft className="text-white" size={35} />
-            </button>
-            <button
-              onClick={() => router.forward()}
-              className="transition hover:opacity-75 cursor-pointer rounded-full bg-black flex justify-center items-center"
-            >
-              <RxCaretRight className="text-white" size={35} />
-            </button>
-          </div>
-          <div className="flex md:hidden gap-x-2 items-center">
-            <button
-              onClick={() => router.push("/")}
-              className="cursor-pointer bg-white transition hover:opacity-75 items-center justify-center rounded-full flex p-2"
-            >
-              <HiHome className="text-black" size={20} />
-            </button>
-
-            <button
-              onClick={() => router.push("/search")}
-              className="cursor-pointer bg-white transition hover:opacity-75 items-center justify-center rounded-full flex p-2"
-            >
-              <BiSearch className="text-black" size={20} />
-            </button>
-          </div>
-
-          <div className="flex justify-between items-center gap-x-4">
-            <div className="flex gap-x-4 items-center">
+          <div className='w-full mb-4 flex items-center justify-between'>
+              <div className='hidden md:flex gap-x-2 items-center'>
+                  <button
+                      onClick={() => router.back()}
+                      className='
+              rounded-full 
+              bg-black 
+              flex 
+              items-center 
+              justify-center 
+              cursor-pointer 
+              hover:opacity-75 
+              transition
+            '
+                  >
+                      <RxCaretLeft className='text-white' size={35}/>
+                  </button>
+                  <button
+                      onClick={() => router.forward()}
+                      className='
+              rounded-full 
+              bg-black 
+              flex 
+              items-center 
+              justify-center 
+              cursor-pointer 
+              hover:opacity-75 
+              transition
+            '
+                  >
+                      <RxCaretRight className='text-white' size={35}/>
+                  </button>
+              </div>
+              <div className='flex md:hidden gap-x-2 items-center'>
+                  <button
+                      onClick={() => router.push('/')}
+                      className='
+              rounded-full 
+              p-2 
+              bg-white 
+              flex 
+              items-center 
+              justify-center 
+              cursor-pointer 
+              hover:opacity-75 
+              transition
+            '
+                  >
+                      <HiHome className='text-black' size={20}/>
+                  </button>
+                  <button
+                      onClick={() => router.push('/search')}
+                      className='
+              rounded-full 
+              p-2 
+              bg-white 
+              flex 
+              items-center 
+              justify-center 
+              cursor-pointer 
+              hover:opacity-75 
+              transition
+            '
+                  >
+                      <BiSearch className='text-black' size={20}/>
+                  </button>
+              </div>
+              <div className='flex justify-between items-center gap-x-4'>
+                  {user ? (
+                      <div className='flex gap-x-4 items-center'>
+                          <Button onClick={handleLogout} className='bg-white px-6 py-2'>
+                              Logout
+                          </Button>
               <Button
-                onClick={() => router.push("/account")}
-                className="bg-white px-6 py-2"
+                  onClick={() => router.push('/account')}
+                  className='bg-white'
               >
                 <FaUserAlt />
               </Button>
             </div>
-
+                  ) : (
             <>
               <div>
                 <Button
                   onClick={authModal.onOpen}
-                  className="bg-blue-600 text-neutral-300 font-medium"
+                  className='
+                    bg-transparent 
+                    text-neutral-300 
+                    font-medium
+                  '
                 >
                   Sign up
                 </Button>
@@ -86,17 +147,17 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
               <div>
                 <Button
                   onClick={authModal.onOpen}
-                  className="bg-yellow-400 px-6 py-2"
+                  className='bg-white px-6 py-2'
                 >
                   Log in
                 </Button>
               </div>
             </>
+                  )}
+              </div>
           </div>
-        </div>
-        {children}
+          {children}
       </div>
-    </>
   );
 };
 
