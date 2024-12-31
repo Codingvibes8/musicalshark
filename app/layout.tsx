@@ -1,20 +1,20 @@
 import {Figtree} from 'next/font/google';
-
-import getSongsByUserId from '@/actions/getSongsByUserId';
-import getActiveProductsWithPrices from '@/actions/getActiveProductsWithPrices';
+import './globals.css';
 import Sidebar from '@/components/Sidebar';
 import ToasterProvider from '@/providers/ToasterProvider';
 import UserProvider from '@/providers/UserProvider';
 import ModalProvider from '@/providers/ModalProvider';
 import SupabaseProvider from '@/providers/SupabaseProvider';
-import Player from '@/components/Player';
+//import Player from '@/components/Player';
+//import getSongsByUserId from '@/actions/getSongsByUserId';
+//import getActiveProductsWithPrices from '@/actions/getActiveProductsWithPrices';
 
-import './globals.css';
+
 
 const font = Figtree({subsets: ['latin']});
 
 export const metadata = {
-    title: 'Spotify Cloned',
+    title: 'musicalshark',
     description:
         '🎵🎧Spotify clone created by codigvibes8 using Next.js 13, Tailwind CSS and TypeScript. 🔊🎶',
 };
@@ -26,8 +26,8 @@ export default async function RootLayout({
                                          }: {
     children: React.ReactNode;
 }) {
-    const products = await getActiveProductsWithPrices();
-    const userSongs = await getSongsByUserId();
+    // const products = await getActiveProductsWithPrices();
+    // const userSongs = await getSongsByUserId();
 
     return (
         <html lang='en'>
@@ -35,9 +35,9 @@ export default async function RootLayout({
         <ToasterProvider/>
         <SupabaseProvider>
             <UserProvider>
-                <ModalProvider products={products}/>
-                <Sidebar songs={userSongs}>{children}</Sidebar>
-                <Player/>
+                <ModalProvider/>
+                <Sidebar>{children}</Sidebar>
+                {/*// <Player/>*/}
             </UserProvider>
         </SupabaseProvider>
         </body>

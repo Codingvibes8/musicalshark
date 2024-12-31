@@ -18,6 +18,7 @@ const AuthModal = () => {
   const router = useRouter();
   const { onClose, isOpen } = useAuthModal();
 
+
   const supabaseClient = useSupabaseClient();
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const AuthModal = () => {
     >
       <Auth
         supabaseClient={supabaseClient}
-        providers={['github']}
+        providers={['github', 'google']}
         magicLink={true}
         appearance={{
           theme: ThemeSupa,
